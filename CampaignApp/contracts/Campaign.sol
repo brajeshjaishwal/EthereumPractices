@@ -5,8 +5,12 @@ contract CampaignFactory
     address[] public campaigns;
 
     function createCampaign(string desc, uint16 min) public returns (address) {
-        Campaign temp = new Campaign(min, desc, msg.sender);
+        address temp = new Campaign(min, desc, msg.sender);
         campaigns.push(temp);
+    }
+    
+    function getDeployedCampaigns() public view returns (address[]){
+        return campaigns;
     }
 }
 
@@ -17,26 +21,58 @@ contract Campaign
         uint16 value;
         address vendor;
         uint16 totalApprovals;
-        mapping(address => bool) approvars;
+        bool completed;
+        mapping(address => bool) approvers;
     }
 
-    address[] contributers;
     address manager;
     uint16 public minimumContribution;
+    
+    //spend requests
+    Request[] spendRequests;
+    
+    address[] contributers;
+    uint16 public totalContributers;
+    
     function Campaign(uint16 minimum, string desc, address creator) public {
         minimumContribution = minimum;
         manager = creator;
     }
-
-    function createRequest() public {
-
+    
+    modifier isOwner() {
+        require(msg.sender == manager);
+        _;
     }
 
-    function approveRequest() public {
-
+    function createRequest(address reciepent, string desc, uint16 amount) public isOwner {
+        Request memory req = Request({
+            Description: desc,
+            vendor: reciepent,
+            value: amount,
+            completed: false,
+            totalApprovals: 0
+        });
+        spendRequests.push(req);
     }
 
-    function finalizeRequest() public {
+    function approveRequest(uint16 index) public {
+        Request storage request = spendRequests[index];
+        require(!request.approvers[msg.sender]);
+        
+        request.approvers[msg.sender] = true;
+        request.totalApprovals ++;
+    }
 
+    function finalizeRequest(uint16 index) public isOwner {
+        Request storage request = spendRequests[index];
+        require(!request.completed);
+        require(request.totalApprovals > totalContributers / 2);
+        
+        request.completed = true;
+        request.vendor.transfer(request.value);
+    }
+    
+    function getContributorCount() public isOwner view returns (uint16) {
+        return totalContributers;
     }
 }
