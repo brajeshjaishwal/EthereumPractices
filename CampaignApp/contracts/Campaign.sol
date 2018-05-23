@@ -3,13 +3,10 @@ pragma solidity^ 0.4.19;
 contract CampaignFactory
 {
     address[] public campaigns;
-    address public creator;
 
     function createCampaign(string desc, uint16 min) public returns (address) {
-        Campaign temp = Campaign(
-            minimumContribution = min,
-            Description = desc
-        );
+        Campaign temp = new Campaign(min, desc, msg.sender);
+        campaigns.push(temp);
     }
 }
 
@@ -26,7 +23,7 @@ contract Campaign
     address[] contributers;
     address manager;
     uint16 public minimumContribution;
-    function Campaign(uint16 minimum, address creator) public {
+    function Campaign(uint16 minimum, string desc, address creator) public {
         minimumContribution = minimum;
         manager = creator;
     }
