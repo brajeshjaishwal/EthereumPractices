@@ -1,18 +1,4 @@
-pragma solidity^ 0.4.19;
-
-contract CampaignFactory
-{
-    address[] public campaigns;
-
-    function createCampaign(string desc, uint16 min) public returns (address) {
-        address temp = new Campaign(min, desc, msg.sender);
-        campaigns.push(temp);
-    }
-    
-    function getDeployedCampaigns() public view returns (address[]){
-        return campaigns;
-    }
-}
+pragma solidity ^0.4.19;
 
 contract Campaign
 {
@@ -27,14 +13,14 @@ contract Campaign
 
     address manager;
     uint16 public minimumContribution;
-    
+    string public Description;
     //spend requests
     Request[] spendRequests;
     
     address[] contributers;
     uint16 public totalContributers;
     
-    function Campaign(uint16 minimum, string desc, address creator) public {
+    function Campaign(uint16 minimum, address creator) public {
         minimumContribution = minimum;
         manager = creator;
     }

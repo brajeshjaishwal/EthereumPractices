@@ -1,7 +1,8 @@
-var Campaign = artifacts.require("./Campaign.sol");
+var Campaign = artifacts.require("./contracts/Campaign.sol");
+var CampaignFactory = artifacts.require("./contracts/CampaignFactory.sol");
 
-export default function (deployer) {
-  deployer.deploy(Campaign);
-  //deployer.link(ConvertLib, MetaCoin);
-  //deployer.deploy(MetaCoin);
-}
+module.exports = function(deployer) {
+  deployer.deploy(CampaignFactory);
+  deployer.deploy(Campaign, 100, 0x100000);
+  deployer.link(Campaign, CampaignFactory);
+};
